@@ -59,26 +59,34 @@ def error_handler(resp):
     return success_response
 
 
+answer = ""
+
+
 def send_request(task):
-    answer = ""
+    global answer
 
     if count_token(task) > max_tokens:
         logging.warning("The request exceeds the token limit")
         return "Запрос слишком длинный"
 
-    if task == "продолжить".lower():
-        assistant_content = "Решим задачу по шагам: " + answer
-
     else:
-        answer = ""
-        assistant_content = "Решим задачу по шагам: "
+        if task == "продолжить".lower():
+            assistant_content = "Решим задачу по шагам: " + answer
 
-    resp = requests.post(
-        url=url,
-        headers=headers,
-        json=create_prompt(task, answer, assistant_content))
+        else:
+            answer = ""
+            assistant_content = "Решим задачу по шагам: "
+
+        resp = requests.post(
+            url=url,
+            headers=headers,
+            json=create_prompt(task, answer, assistant_content))
 
     full_response = error_handler(resp)
+
+    if not full_response:
+        return False
+
     message = full_response['choices'][0]['message']['content']
     answer += message
     return answer
