@@ -7,11 +7,13 @@ headers = {"Content-Type": "application/json"}
 max_tokens = 35
 
 logging.basicConfig(
-    level=logging.WARNING,
+    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     filename="log_file.txt",
     filemode="w"
 )
+
+say_continue = ['продолжить', 'продолжи', 'продолжи ответ', 'next', 'далее']
 
 
 def count_token(text):
@@ -24,7 +26,7 @@ def create_prompt(user_request, answer, assistant_content):
         "messages": [
             {
                 "role": "system",
-                "content": "Отвечай как русский учитель по языку программирования Python"
+                "content": "Отвечай как русский учитель по языку программирования Python, а также поддерживай разговор с пользователем."
             },
             {
                 "role": "user",
@@ -36,7 +38,7 @@ def create_prompt(user_request, answer, assistant_content):
             }
         ],
         "temperature": 1,
-        "max_tokens": 64
+        "max_tokens": 128
     }
     return json
 
@@ -70,7 +72,7 @@ def send_request(task):
         return "Запрос слишком длинный"
 
     else:
-        if task == "продолжить".lower():
+        if task in say_continue:
             assistant_content = "Решим задачу по шагам: " + answer
 
         else:
