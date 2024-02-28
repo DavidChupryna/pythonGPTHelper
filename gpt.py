@@ -1,16 +1,15 @@
 import logging
 import requests
 from transformers import AutoTokenizer
-from config import url
+from config import config
 
-headers = {"Content-Type": "application/json"}
-max_tokens = 35
+max_tokens = int(config['GPT']['MAX_MESSAGE_TOKENS'])
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    filename="log_file.txt",
-    filemode="w"
+    level=config['LOGGING']['level'],
+    format=config['LOGGING']['format'],
+    filename=config['LOGGING']['filename'],
+    filemode=config['LOGGING']['filemod']
 )
 
 say_continue = ['продолжить', 'продолжи', 'продолжи ответ', 'next', 'далее']
@@ -26,7 +25,8 @@ def create_prompt(user_request, answer, assistant_content):
         "messages": [
             {
                 "role": "system",
-                "content": "Отвечай как русский учитель по языку программирования Python, а также поддерживай разговор с пользователем."
+                "content": "Отвечай как русский учитель по языку программирования Python, а также поддерживай "
+                           "разговор с пользователем."
             },
             {
                 "role": "user",
@@ -37,8 +37,8 @@ def create_prompt(user_request, answer, assistant_content):
                 "content": assistant_content + answer
             }
         ],
-        "temperature": 1,
-        "max_tokens": 128
+        "temperature": config['GPT']['TEMPERATURE'],
+        "max_tokens": config['GPT']['MAX_TOKENS']
     }
     return json
 
@@ -80,8 +80,8 @@ def send_request(task):
             assistant_content = "Решим задачу по шагам: "
 
         resp = requests.post(
-            url=url,
-            headers=headers,
+            url=config['GPT']['URL'],
+            headers={"Content-Type": "application/json"},
             json=create_prompt(task, answer, assistant_content))
 
     full_response = error_handler(resp)

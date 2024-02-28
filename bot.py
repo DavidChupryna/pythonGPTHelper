@@ -1,5 +1,4 @@
 import logging
-
 import telebot
 from config import token
 from data import load_user_data, save_user_data
@@ -11,19 +10,11 @@ data_path = 'users.json'
 user_data = load_user_data(data_path)
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    filename="loging_file.txt",
-    filemode="w"
-)
-
-
 @bot.message_handler(commands=['start'])
 def say_start(message):
     bot.send_message(message.chat.id, "Привет! Я GPT хелпер по языку программирования Python🐍. \n"
                                       "Для полного ознакопления с ботом, воспользуйтесь командой /help")
-    logging.info("say start")
+    logging.info("Say start")
     user_id = str(message.from_user.id)
     if user_id not in user_data:
         user_data[user_id] = {}
@@ -45,15 +36,11 @@ def say_help(message):
                                       "/start_gpt - начать работу с нейросетью.")
 
 
-@bot.message_handler(content_types=['text'])
-def solve_task_not_running(message):
-    bot.send_message(message.chat.id, "Для начала работы с нейросетью, воспользуйтесь командой /start_gpt")
-
-
 @bot.message_handler(commands=['debug'])
 def send_logs(message):
     with open("log_file.txt", "rb") as f:
         bot.send_document(message.chat.id, f)
+        logging.info("Use command DEBUG")
 
 
 @bot.message_handler(commands=['start_gpt'])
@@ -69,8 +56,7 @@ def send_task(message):
     if user_prompt in ['/start', '/help', '/debug']:
         bot.send_message(user_id, "В режиме запроса к нейросети, команды не работают. Воспользуйтесь ими повторно: \n"
                                   "/start \n"
-                                  "/help \n"
-                                  "/debug.")
+                                  "/help ")
         return
     gpt_response = send_request(user_prompt)
     logging.info("Send task to GPT")
@@ -84,6 +70,11 @@ def send_task(message):
         bot.send_message(user_id, "Произошла ошибка")
 
     bot.register_next_step_handler(message, send_task)
+
+
+@bot.message_handler(content_types=['text'])
+def solve_task_not_running(message):
+    bot.send_message(message.chat.id, "Для начала работы с нейросетью, воспользуйтесь командой /start_gpt")
 
 
 bot.polling()
