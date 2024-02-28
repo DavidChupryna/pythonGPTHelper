@@ -65,6 +65,7 @@ def send_task(message):
             bot.send_message(user_id, "Ответ на ваш вопрос полностью сгенирирован. Задайте слеующий!")
         else:
             bot.send_message(user_id, gpt_response)
+            bot.send_message(user_id, "Если хочешь продолжение ответа, напиши: 'продолжить' или 'далее'.")
             logging.info("GPT send answer")
     else:
         bot.send_message(user_id, "Произошла ошибка")
