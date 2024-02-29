@@ -20,7 +20,7 @@ def count_token(text):
     return len(tokenizers.encode(text))
 
 
-def create_prompt(user_request, answer, assistant_content):
+def create_prompt(user_request, assistant_content):
     json = {
         "messages": [
             {
@@ -34,7 +34,7 @@ def create_prompt(user_request, answer, assistant_content):
             },
             {
                 "role": "assistant",
-                "content": assistant_content + answer
+                "content": assistant_content
             }
         ],
         "temperature": config['GPT']['TEMPERATURE'],
@@ -82,7 +82,7 @@ def send_request(task):
         resp = requests.post(
             url=config['GPT']['URL'],
             headers={"Content-Type": "application/json"},
-            json=create_prompt(task, answer, assistant_content))
+            json=create_prompt(task, assistant_content))
 
     full_response = error_handler(resp)
 
