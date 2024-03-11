@@ -20,13 +20,31 @@ def count_token(text):
     return len(tokenizers.encode(text))
 
 
-def create_prompt(user_request, assistant_content):
+def select_system_role(task: str, level: str):
+    if task == 'Python':
+        if level == 'Начальный':
+            role_system = config['TEMPLATE_GPT']['PYTHON_BEGINNER']
+            return role_system
+        elif level == 'Продвинутый':
+            role_system = config['TEMPLATE_GPT']['PYTHON_ADVANCED']
+            return role_system
+    elif task == 'JavaScript':
+        if level == 'Начальный':
+            role_system = config['TEMPLATE_GPT']['JAVA_SCRIPT_BEGINNER']
+            return role_system
+        elif level == 'Продвинутый':
+            role_system = config['TEMPLATE_GPT']['JAVA_SCRIPT_ADVANCED']
+            return role_system
+    else:
+        return 'Введите коректный запрос.'
+
+
+def create_prompt(user_request, assistant_content, role_system):
     json = {
         "messages": [
             {
                 "role": "system",
-                "content": "Отвечай как русский учитель по языку программирования Python, а также поддерживай "
-                           "разговор с пользователем."
+                "content": role_system
             },
             {
                 "role": "user",
@@ -64,7 +82,7 @@ def error_handler(resp):
 answer = ""
 
 
-def send_request(task):
+def send_request(task, system_role):
     global answer
 
     if count_token(task) > max_tokens:
@@ -82,7 +100,7 @@ def send_request(task):
         resp = requests.post(
             url=config['GPT']['URL'],
             headers={"Content-Type": "application/json"},
-            json=create_prompt(task, assistant_content))
+            json=create_prompt(task, assistant_content, system_role))
 
     full_response = error_handler(resp)
 
@@ -92,4 +110,3 @@ def send_request(task):
     message = full_response['choices'][0]['message']['content']
     answer += message
     return answer
-
