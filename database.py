@@ -4,7 +4,7 @@ import sqlite3
 
 def create_table():
     try:
-        con = sqlite3.connect('db.sqlite')
+        con = sqlite3.connect('users.db')
         cur = con.cursor()
         cur.execute('''
             CREATE TABLE IF NOT EXISTS users(
@@ -26,7 +26,7 @@ def create_table():
 def get_data():
     user = {}
     try:
-        con = sqlite3.connect('db.sqlite')
+        con = sqlite3.connect('users.db')
         cur = con.cursor()
         query = cur.execute('''
             SELECT user_id, name, subject, level
@@ -49,7 +49,7 @@ def get_data():
 
 def insert_data(user_id=None, name=None, subject=None, level=None, task=None, answer=None):
     try:
-        con = sqlite3.connect('db.sqlite')
+        con = sqlite3.connect('users.db')
         cur = con.cursor()
         cur.execute(f'INSERT INTO users(user_id, name, subject, level, task, answer)'
                     f'VALUES (?, ?, ?, ?, ?, ?);',
@@ -64,7 +64,7 @@ def insert_data(user_id=None, name=None, subject=None, level=None, task=None, an
 
 def update_data(user_id, column, value):
     try:
-        con = sqlite3.connect('db.sqlite')
+        con = sqlite3.connect('users.db')
         cur = con.cursor()
         cur.execute(f'UPDATE users '
                     f'SET {column} = ? '
@@ -79,7 +79,7 @@ def update_data(user_id, column, value):
 
 def delete_data(user_id):
     try:
-        con = sqlite3.connect('db.sqlite')
+        con = sqlite3.connect('users.db')
         cur = con.cursor()
         cur.execute(f'DELETE FROM users WHERE user_id = ?', (user_id,))
         con.commit()
